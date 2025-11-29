@@ -1,0 +1,136 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  NOTESAPP_IMAGE: ${{ secrets.DOCKER_USERNAME }}/notesportal-app
+  NOTESAPI_IMAGE: ${{ secrets.DOCKER_USERNAME }}/notesportal-api
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies - NotesApp
+        run: dotnet restore NotesApp/NotesApp.csproj
+
+      - name: Build NotesApp
+        run: dotnet build NotesApp/NotesApp.csproj --configuration Release --no-restore
+
+      - name: Restore dependencies - NotesApi
+        run: dotnet restore NotesApi/NotesApi.csproj
+
+      - name: Build NotesApi
+        run: dotnet build NotesApi/NotesApi.csproj --configuration Release --no-restore
+
+  build-and-push-images:
+    name: Build and Push Docker Images
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Extract metadata for NotesApp
+        id: meta-app
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.NOTESAPP_IMAGE }}
+          tags: |
+            type=raw,value=latest
+            type=sha,prefix={{branch}}-
+
+      - name: Build and push NotesApp
+        uses: docker/build-push-action@v5
+        with:
+          context: ./NotesApp
+          file: ./NotesApp/Dockerfile
+          push: true
+          tags: ${{ steps.meta-app.outputs.tags }}
+          labels: ${{ steps.meta-app.outputs.labels }}
+          cache-from: type=registry,ref=${{ env.NOTESAPP_IMAGE }}:buildcache
+          cache-to: type=registry,ref=${{ env.NOTESAPP_IMAGE }}:buildcache,mode=max
+
+      - name: Extract metadata for NotesApi
+        id: meta-api
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.NOTESAPI_IMAGE }}
+          tags: |
+            type=raw,value=latest
+            type=sha,prefix={{branch}}-
+
+      - name: Build and push NotesApi
+        uses: docker/build-push-action@v5
+        with:
+          context: ./NotesApi
+          file: ./NotesApi/Dockerfile
+          push: true
+          tags: ${{ steps.meta-api.outputs.tags }}
+          labels: ${{ steps.meta-api.outputs.labels }}
+          cache-from: type=registry,ref=${{ env.NOTESAPI_IMAGE }}:buildcache
+          cache-to: type=registry,ref=${{ env.NOTESAPI_IMAGE }}:buildcache,mode=max
+
+  deploy:
+    name: Deploy to AWS EC2
+    runs-on: ubuntu-latest
+    needs: build-and-push-images
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to AWS EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.AWS_HOST }}
+          username: ${{ secrets.AWS_USERNAME }}
+          key: ${{ secrets.AWS_SSH_KEY }}
+          port: ${{ secrets.AWS_SSH_PORT || 22 }}
+          script: |
+            cd /home/${{ secrets.AWS_USERNAME }}/notesportal
+            
+            # Pull latest images
+            docker pull ${{ env.NOTESAPP_IMAGE }}:latest
+            docker pull ${{ env.NOTESAPI_IMAGE }}:latest
+            
+            # Update docker-compose and restart
+            export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
+            export POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+            export POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+            export POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+            export IMAGE_TAG=latest
+            
+            docker-compose -f docker-compose.prod.yml down
+            docker-compose -f docker-compose.prod.yml up -d
+            
+            # Clean up old images
+            docker image prune -af --filter "until=24h"
+

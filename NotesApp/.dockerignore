@@ -1,0 +1,15 @@
+bin/
+obj/
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.dbmdl
+*.jfm
+Dockerfile
+docker-compose*.yml
+.git/
+.gitignore
+README.md
+

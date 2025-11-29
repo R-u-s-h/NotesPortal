@@ -36,6 +36,13 @@ bld/
 **/appsettings.Production.json
 secrets.json
 
+# Docker and deployment secrets
+.env
+.env.local
+.env.production
+*.pem
+*.key
+
 # NuGet Packages
 *.nupkg
 *.snupkg

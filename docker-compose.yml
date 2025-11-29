@@ -1,0 +1,69 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: notesportal-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: notesuser
+      POSTGRES_PASSWORD: notespassword
+      POSTGRES_DB: notesportal_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U notesuser -d notesportal_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - notesportal-network
+
+  notesapi:
+    build:
+      context: ./NotesApi
+      dockerfile: Dockerfile
+    container_name: notesportal-api
+    restart: always
+    ports:
+      - "5001:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultDbConnection=Host=postgres;Port=5432;Database=notesportal_db;Username=notesuser;Password=notespassword
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - notesportal-network
+
+  notesapp:
+    build:
+      context: ./NotesApp
+      dockerfile: Dockerfile
+    container_name: notesportal-app
+    restart: always
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultDbConnection=Host=postgres;Port=5432;Database=notesportal_db;Username=notesuser;Password=notespassword
+    depends_on:
+      postgres:
+        condition: service_healthy
+      notesapi:
+        condition: service_started
+    networks:
+      - notesportal-network
+    volumes:
+      - notesapp_images:/app/wwwroot/images
+
+volumes:
+  postgres_data:
+  notesapp_images:
+
+networks:
+  notesportal-network:
+    driver: bridge
+
