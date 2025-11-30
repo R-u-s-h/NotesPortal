@@ -43,11 +43,10 @@ builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
-if (app.Environment.IsProduction())
+using (var scope = app.Services.CreateScope())
 {
-    using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<NotesDbContext>();
-    await db.Database.MigrateAsync();
+    db.Database.Migrate();
 }
 
 // Configure the HTTP request pipeline.
@@ -80,4 +79,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Notes}/{action=Index}/{id?}");
 
-await app.RunAsync();
+app.Run();
+
+

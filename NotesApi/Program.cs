@@ -49,7 +49,7 @@ if (app.Environment.IsProduction())
     using (var scope = app.Services.CreateScope())
     {
         var db = scope.ServiceProvider.GetRequiredService<NotesApiDbContext>();
-        await db.Database.MigrateAsync();
+        db.Database.Migrate();
     }
 }
 
@@ -63,4 +63,4 @@ app.UseSwaggerUI(c =>
 
 app.MapControllers();
 
-await app.RunAsync();
+app.Run();
