@@ -3,8 +3,8 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using NotesApp.DbStuff;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -50,21 +50,6 @@ namespace NotesApp.Migrations.NotesDb
                     b.HasIndex("UserWhoAddToFavoriteId");
 
                     b.ToTable("NoteUser");
-                });
-
-            modelBuilder.Entity("NotificationNotesUser", b =>
-                {
-                    b.Property<int>("UserWhoViewedItId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ViewedNotificationId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("UserWhoViewedItId", "ViewedNotificationId");
-
-                    b.HasIndex("ViewedNotificationId");
-
-                    b.ToTable("NotificationNotesUser");
                 });
 
             modelBuilder.Entity("NotesApp.DbStuff.Models.Notes.Category", b =>
@@ -212,6 +197,21 @@ namespace NotesApp.Migrations.NotesDb
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("NotificationNotesUser", b =>
+                {
+                    b.Property<int>("UserWhoViewedItId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ViewedNotificationId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("UserWhoViewedItId", "ViewedNotificationId");
+
+                    b.HasIndex("ViewedNotificationId");
+
+                    b.ToTable("NotificationNotesUser");
+                });
+
             modelBuilder.Entity("NoteTag", b =>
                 {
                     b.HasOne("NotesApp.DbStuff.Models.Notes.Note", null)
@@ -242,21 +242,6 @@ namespace NotesApp.Migrations.NotesDb
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("NotificationNotesUser", b =>
-                {
-                    b.HasOne("NotesApp.DbStuff.Models.Notes.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserWhoViewedItId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("NotesApp.DbStuff.Models.Notes.NotificationNotes", null)
-                        .WithMany()
-                        .HasForeignKey("ViewedNotificationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("NotesApp.DbStuff.Models.Notes.Note", b =>
                 {
                     b.HasOne("NotesApp.DbStuff.Models.Notes.User", "Author")
@@ -283,6 +268,21 @@ namespace NotesApp.Migrations.NotesDb
                         .IsRequired();
 
                     b.Navigation("Author");
+                });
+
+            modelBuilder.Entity("NotificationNotesUser", b =>
+                {
+                    b.HasOne("NotesApp.DbStuff.Models.Notes.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserWhoViewedItId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NotesApp.DbStuff.Models.Notes.NotificationNotes", null)
+                        .WithMany()
+                        .HasForeignKey("ViewedNotificationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("NotesApp.DbStuff.Models.Notes.Category", b =>

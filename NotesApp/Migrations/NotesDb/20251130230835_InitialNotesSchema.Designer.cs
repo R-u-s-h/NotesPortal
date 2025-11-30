@@ -4,16 +4,16 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using NotesApp.DbStuff;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace NotesApp.Migrations.NotesDb
 {
     [DbContext(typeof(NotesDbContext))]
-    [Migration("20250831184330_AddRoleForNotesUser")]
-    partial class AddRoleForNotesUser
+    [Migration("20251130230835_InitialNotesSchema")]
+    partial class InitialNotesSchema
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -53,37 +53,6 @@ namespace NotesApp.Migrations.NotesDb
                     b.HasIndex("UserWhoAddToFavoriteId");
 
                     b.ToTable("NoteUser");
-                });
-
-            modelBuilder.Entity("NotesApp.DbStuff.Models.Notes.Banner", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Banners");
                 });
 
             modelBuilder.Entity("NotesApp.DbStuff.Models.Notes.Category", b =>
@@ -149,6 +118,31 @@ namespace NotesApp.Migrations.NotesDb
                     b.ToTable("Notes");
                 });
 
+            modelBuilder.Entity("NotesApp.DbStuff.Models.Notes.NotificationNotes", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AuthorId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("NotesApp.DbStuff.Models.Notes.Tag", b =>
                 {
                     b.Property<int>("Id")
@@ -184,6 +178,9 @@ namespace NotesApp.Migrations.NotesDb
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("Language")
+                        .HasColumnType("integer");
+
                     b.Property<int?>("Money")
                         .HasColumnType("integer");
 
@@ -201,6 +198,21 @@ namespace NotesApp.Migrations.NotesDb
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("NotificationNotesUser", b =>
+                {
+                    b.Property<int>("UserWhoViewedItId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ViewedNotificationId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("UserWhoViewedItId", "ViewedNotificationId");
+
+                    b.HasIndex("ViewedNotificationId");
+
+                    b.ToTable("NotificationNotesUser");
                 });
 
             modelBuilder.Entity("NoteTag", b =>
@@ -250,6 +262,32 @@ namespace NotesApp.Migrations.NotesDb
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("NotesApp.DbStuff.Models.Notes.NotificationNotes", b =>
+                {
+                    b.HasOne("NotesApp.DbStuff.Models.Notes.User", "Author")
+                        .WithMany("NotificationCreatedByMe")
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Author");
+                });
+
+            modelBuilder.Entity("NotificationNotesUser", b =>
+                {
+                    b.HasOne("NotesApp.DbStuff.Models.Notes.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserWhoViewedItId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NotesApp.DbStuff.Models.Notes.NotificationNotes", null)
+                        .WithMany()
+                        .HasForeignKey("ViewedNotificationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("NotesApp.DbStuff.Models.Notes.Category", b =>
                 {
                     b.Navigation("Notes");
@@ -258,6 +296,8 @@ namespace NotesApp.Migrations.NotesDb
             modelBuilder.Entity("NotesApp.DbStuff.Models.Notes.User", b =>
                 {
                     b.Navigation("CreatedNotes");
+
+                    b.Navigation("NotificationCreatedByMe");
                 });
 #pragma warning restore 612, 618
         }
