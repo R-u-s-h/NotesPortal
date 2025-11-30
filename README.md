@@ -36,7 +36,28 @@ End-to-End тесты с использованием Selenium WebDriver и NUni
 
 ## 🚀 Быстрый старт
 
-### Предварительные требования
+### Вариант 1: Docker (Рекомендуется) 🐳
+
+**Самый быстрый способ запустить проект:**
+
+```bash
+git clone https://github.com/R-u-s-h/NotesPortal.git
+cd NotesPortal
+docker-compose up -d
+```
+
+**Готово!** Приложение доступно:
+- **NotesApp**: http://localhost:5000
+- **NotesApi**: http://localhost:5001/swagger
+- **PostgreSQL**: localhost:5432
+
+Остановка: `docker-compose down`
+
+---
+
+### Вариант 2: Локальная установка
+
+#### Предварительные требования
 
 - [.NET 8.0 SDK](https://dotnet.microsoft.com/download)
 - [PostgreSQL](https://www.postgresql.org/download/) 12+
@@ -46,7 +67,7 @@ End-to-End тесты с использованием Selenium WebDriver и NUni
 ### 1. Клонирование репозитория
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/NotesPortal.git
+git clone https://github.com/R-u-s-h/NotesPortal.git
 cd NotesPortal
 ```
 
@@ -288,5 +309,42 @@ dotnet user-secrets list
 
 ```bash
 dotnet user-secrets remove "ConnectionStrings:DefaultDbConnection"
+```
+
+---
+
+## 🚢 CI/CD и Деплой
+
+Проект настроен для автоматического деплоя на AWS EC2 через GitHub Actions.
+
+### ⚡ Быстрый деплой
+
+1. **Настройте GitHub Secrets** (Settings → Secrets):
+   - `DOCKER_USERNAME` и `DOCKER_PASSWORD`
+   - `AWS_HOST`, `AWS_USERNAME`, `AWS_SSH_KEY`
+   - `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`
+
+2. **Push в main ветку:**
+   ```bash
+   git push origin main
+   ```
+
+3. **GitHub Actions автоматически:**
+   - ✅ Соберет и протестирует проект
+   - ✅ Создаст Docker образы
+   - ✅ Задеплоит на AWS EC2
+
+
+### 🛠️ Инфраструктура
+
+- **Docker Hub**: Хранение образов
+- **GitHub Actions**: CI/CD pipeline
+- **AWS EC2**: Хостинг (t2.micro/t3.micro Free Tier)
+- **PostgreSQL 16**: База данных с persistent volume
+
+### 🔄 Workflow
+
+```
+Push → Build & Test → Docker Build → Push to Hub → Deploy to AWS
 ```
 
