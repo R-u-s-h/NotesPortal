@@ -44,14 +44,12 @@ builder.Services.AddCors(o =>
 
 var app = builder.Build();
 
-if (app.Environment.IsProduction())
+using (var scope = app.Services.CreateScope())
 {
-    using (var scope = app.Services.CreateScope())
-    {
-        var db = scope.ServiceProvider.GetRequiredService<NotesApiDbContext>();
-        await db.Database.MigrateAsync();
-    }
+    var db = scope.ServiceProvider.GetRequiredService<NotesApiDbContext>();
+    await db.Database.MigrateAsync();
 }
+
 
 app.UseCors();
 
