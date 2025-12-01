@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using NotesApp.Controllers;
 using NotesApp.CustomMiddleware;
 using NotesApp.DbStuff;
+using NotesApp.DbStuff.Models.Notes;
+using NotesApp.Enum;
 using NotesApp.Hubs;
 using NotesApp.Services;
 using NotesApp.Services.AutoRegistrationInDI;
@@ -47,6 +49,32 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<NotesDbContext>();
     await db.Database.MigrateAsync();
+
+    // Seed admin user from environment variables (if not exists)
+    var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    var adminUserName = configuration["ADMIN_USERNAME"];
+    var adminPassword = configuration["ADMIN_PASSWORD"];
+
+    if (!string.IsNullOrWhiteSpace(adminUserName) &&
+        !string.IsNullOrWhiteSpace(adminPassword) &&
+        !db.Users.Any(u => u.UserName == adminUserName))
+    {
+        var passwordService = scope.ServiceProvider.GetRequiredService<PasswordService>();
+
+        var admin = new User
+        {
+            UserName = adminUserName,
+            AvatarUrl = "images/notes/avatars/default.png",
+            Language = Language.English,
+            Role = NotesUserRole.Administrator,
+            Money = 0
+        };
+
+        admin.PasswordHash = passwordService.HashPassword(admin, adminPassword);
+
+        db.Users.Add(admin);
+        await db.SaveChangesAsync();
+    }
 }
 
 // Configure the HTTP request pipeline.

@@ -127,6 +127,8 @@ jobs:
             export POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
             export POSTGRES_DB=${{ secrets.POSTGRES_DB }}
             export IMAGE_TAG=latest
+            export ADMIN_USERNAME=${{ secrets.ADMIN_USERNAME }}
+            export ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
             
             # Ensure default images directory exists and seed it on first deploy
             sudo mkdir -p /data/notesapp/images

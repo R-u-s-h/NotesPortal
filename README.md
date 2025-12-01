@@ -320,9 +320,10 @@ dotnet user-secrets remove "ConnectionStrings:DefaultDbConnection"
 ### ⚡ Быстрый деплой
 
 1. **Настройте GitHub Secrets** (Settings → Secrets):
-   - `DOCKER_USERNAME` и `DOCKER_PASSWORD`
-   - `AWS_HOST`, `AWS_USERNAME`, `AWS_SSH_KEY`
+   - `DOCKER_USERNAME`, `DOCKER_PASSWORD`
+   - `AWS_HOST`, `AWS_USERNAME`, `AWS_SSH_KEY`, `AWS_SSH_PORT`
    - `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`
+   - `ADMIN_USERNAME`, `ADMIN_PASSWORD` (учётные данные администратора NotesApp)
 
 2. **Push в main ветку:**
    ```bash
