@@ -107,6 +107,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Sync docker-compose.prod.yml to AWS EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.AWS_HOST }}
+          username: ${{ secrets.AWS_USERNAME }}
+          key: ${{ secrets.AWS_SSH_KEY }}
+          port: ${{ secrets.AWS_SSH_PORT || 22 }}
+          source: "docker-compose.prod.yml"
+          target: "/home/${{ secrets.AWS_USERNAME }}/notesportal"
+
       - name: Deploy to AWS EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
