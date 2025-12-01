@@ -108,7 +108,7 @@ public class NotesController : Controller
 
     // /Notes/Add (GET)
     [HttpGet]
-    [RoleNotes(NotesUserRole.Administrator, NotesUserRole.Moderator)]
+    [RoleNotes(NotesUserRole.Administrator, NotesUserRole.Moderator, NotesUserRole.Moderator)]
     public IActionResult Add()
     {
         var viewModel = new NoteFormViewModel
@@ -123,7 +123,7 @@ public class NotesController : Controller
 
     // /Notes/Add (POST)
     [HttpPost]
-    [RoleNotes(NotesUserRole.Administrator, NotesUserRole.Moderator)]
+    [RoleNotes(NotesUserRole.Administrator, NotesUserRole.Moderator, NotesUserRole.Moderator)]
     public IActionResult Add(NoteFormViewModel viewModel)
     {
         if (!ModelState.IsValid)

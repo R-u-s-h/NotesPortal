@@ -34,7 +34,7 @@ public class CategoriesController : Controller
     
     // /Categories/Add (GET)
     [HttpGet]
-    [RoleNotes(NotesUserRole.Administrator, NotesUserRole.Moderator)]
+    [RoleNotes(NotesUserRole.Administrator, NotesUserRole.Moderator, NotesUserRole.User)]
     public IActionResult Add()
     {
         return View();
@@ -42,7 +42,7 @@ public class CategoriesController : Controller
 
     // /Categories/Add (POST)
     [HttpPost]
-    [RoleNotes(NotesUserRole.Administrator, NotesUserRole.Moderator)]
+    [RoleNotes(NotesUserRole.Administrator, NotesUserRole.Moderator, NotesUserRole.User)]
     public IActionResult Add(CategoryViewModel viewModel)
     {
         

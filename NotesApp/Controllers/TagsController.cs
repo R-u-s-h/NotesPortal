@@ -34,7 +34,7 @@ public class TagsController : Controller
 
     // /Tags/Add (GET)
     [HttpGet]
-    [RoleNotes(NotesUserRole.Administrator, NotesUserRole.Moderator)]
+    [RoleNotes(NotesUserRole.Administrator, NotesUserRole.Moderator, NotesUserRole.User)]
     public IActionResult Add()
     {
         return View();
@@ -42,7 +42,7 @@ public class TagsController : Controller
 
     // /Tags/Add (POST)
     [HttpPost]
-    [RoleNotes(NotesUserRole.Administrator, NotesUserRole.Moderator)]
+    [RoleNotes(NotesUserRole.Administrator, NotesUserRole.Moderator, NotesUserRole.User)]
     public IActionResult Add(TagViewModel viewModel)
     {
         if (!ModelState.IsValid)
