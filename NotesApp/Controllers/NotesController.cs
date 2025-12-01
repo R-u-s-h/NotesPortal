@@ -108,7 +108,7 @@ public class NotesController : Controller
 
     // /Notes/Add (GET)
     [HttpGet]
-    [RoleNotes(NotesUserRole.Administrator, NotesUserRole.Moderator, NotesUserRole.Moderator)]
+    [RoleNotes(NotesUserRole.Administrator, NotesUserRole.Moderator, NotesUserRole.User)]
     public IActionResult Add()
     {
         var viewModel = new NoteFormViewModel
