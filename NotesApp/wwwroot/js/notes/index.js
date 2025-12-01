@@ -13,6 +13,7 @@ $(document).ready(function () {
         currentNote.text(text.hasClass("expanded") ? hide : show);
     });
 
+    // Редактирование заголовка заметки
     $(".note .note-title .view").on("click", function () {
         const titleBlock = $(this).closest(".note-title");
 
@@ -54,6 +55,40 @@ $(document).ready(function () {
         }
     });
 
+    // Простой клиентский поиск по заметкам
+    const $searchInput = $(".search input");
+
+    // Запускаем поиск только на страницах, где есть список заметок
+    if ($searchInput.length && $(".note").length) {
+        $searchInput.on("input", function () {
+            const query = $(this).val().toString().toLowerCase().trim();
+
+            // Если строка поиска пустая — показываем все заметки
+            if (!query) {
+                $(".note").show();
+                return;
+            }
+
+            $(".note").each(function () {
+                const $note = $(this);
+
+                const titleText = $note.find(".note-title .view").text().toLowerCase();
+                const bodyText = $note.find(".note-text").text().toLowerCase();
+                const tagsText = $note.find(".tags-inline").text().toLowerCase();
+                const authorText = $note.find(".author").text().toLowerCase();
+
+                const haystack = `${titleText} ${bodyText} ${tagsText} ${authorText}`;
+
+                if (haystack.indexOf(query) !== -1) {
+                    $note.show();
+                } else {
+                    $note.hide();
+                }
+            });
+        });
+    }
+
+    // Загрузка баннеров
     $.getJSON(`${notesApiUrl}/api/v1/banners`, function (banners) {
         const adsBlock = $(".ads");
 
