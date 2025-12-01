@@ -139,7 +139,6 @@ jobs:
             export IMAGE_TAG=latest
             export ADMIN_USERNAME=${{ secrets.ADMIN_USERNAME }}
             export ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
-            export NOTESAPP_ENV_CHECK=${{ secrets.NOTESAPP_ENV_CHECK }}
             
             # Ensure default images directory exists and seed it on first deploy
             sudo mkdir -p /data/notesapp/images
