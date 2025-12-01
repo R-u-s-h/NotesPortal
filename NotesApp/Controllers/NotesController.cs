@@ -126,7 +126,7 @@ public class NotesController : Controller
 
     // /Notes/Add (POST)
     [HttpPost]
-    [RoleNotes(NotesUserRole.Administrator, NotesUserRole.Moderator, NotesUserRole.Moderator)]
+    [RoleNotes(NotesUserRole.Administrator, NotesUserRole.Moderator, NotesUserRole.Moderator, NotesUserRole.User)]
     public IActionResult Add(NoteFormViewModel viewModel)
     {
         if (!ModelState.IsValid)
