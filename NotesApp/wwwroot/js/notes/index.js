@@ -1,6 +1,6 @@
 $(document).ready(function () {
-    const baseUrl = 'http://localhost:5062';
-    const notesApiUrl = 'http://localhost:5244';
+    const baseUrl = 'http://16.171.38.19';
+    const notesApiUrl = 'http://16.171.38.19:5001';
     $(".toggle-note").click(function (e) {
         e.preventDefault();
 

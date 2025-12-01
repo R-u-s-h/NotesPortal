@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    const baseUrl = 'http://localhost:5062';
+    const baseUrl = 'http://16.171.38.19';
     let debounceTimer;
 
     $('#UserName').on("focusout", function (e) {
