@@ -104,8 +104,8 @@ public class AuthNotesController : Controller
         return Json(isUniq);
     }
 
-    public IActionResult AccessDenied()
+    public IActionResult Forbid()
     {
-        return View("Forbid");
+        return View();
     }
 }

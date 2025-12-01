@@ -23,7 +23,7 @@ builder.Services
     .AddCookie(AuthNotesController.AUTH_KEY, o =>
     {
         o.LoginPath = "/AuthNotes/Login";
-        o.AccessDeniedPath = "/AuthNotes/AccessDenied";
+        o.AccessDeniedPath = "/AuthNotes/Forbid";
     });
 
 // Register db context
