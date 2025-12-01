@@ -6,6 +6,12 @@
 <div>
     @foreach (var tag in Model)
     {
-        <div>@tag.Name</div>
+        <div>
+            @tag.Name
+            @if (tag.IsAllowedToDelete)
+            {
+                <a href="/Tags/Remove?id=@tag.Id" title="Delete" style="margin-left:8px;">✕</a>
+            }
+        </div>
     }
 </div>

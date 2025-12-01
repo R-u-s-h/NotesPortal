@@ -6,6 +6,7 @@ using NotesApp.DbStuff.Models.Notes;
 using NotesApp.DbStuff.Repositories.Interfaces.Notes;
 using NotesApp.Enum;
 using NotesApp.Models.Notes;
+using NotesApp.Services;
 
 namespace NotesApp.Controllers;
 
@@ -14,18 +15,26 @@ namespace NotesApp.Controllers;
 public class TagsController : Controller
 {
     private ITagRepository _tagRepository;
+    private IAuthNotesService _authNotesService;
 
-    public TagsController(ITagRepository tagRepository)
+    public TagsController(ITagRepository tagRepository, IAuthNotesService authNotesService)
     {
         _tagRepository = tagRepository;
+        _authNotesService = authNotesService;
     }
     public IActionResult Index()
     {
+        var canDelete = _authNotesService.IsAuthenticated() &&
+                        (_authNotesService.GetRole() == NotesUserRole.Administrator ||
+                         _authNotesService.GetRole() == NotesUserRole.Moderator);
+
         var tagViewModels = _tagRepository
             .GetAll()
             .Select(x => new TagViewModel
             {
+                Id = x.Id,
                 Name = x.Name,
+                IsAllowedToDelete = canDelete
             })
             .ToList();
 
@@ -60,5 +69,14 @@ public class TagsController : Controller
         _tagRepository.Add(tag);
 
         return RedirectToAction("Index", "Notes");
+    }
+
+    [HttpGet]
+    [RoleNotes(NotesUserRole.Administrator, NotesUserRole.Moderator)]
+    public IActionResult Remove(int id)
+    {
+        _tagRepository.Remove(id);
+
+        return RedirectToAction("Index");
     }
 }

@@ -6,6 +6,12 @@
 <div>
     @foreach (var category in Model)
     {
-        <div>@category.Name</div>
+        <div>
+            @category.Name
+            @if (category.IsAllowedToDelete)
+            {
+                <a href="/Categories/Remove?id=@category.Id" title="Delete" style="margin-left:8px;">✕</a>
+            }
+        </div>
     }
 </div>

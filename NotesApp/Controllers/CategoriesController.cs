@@ -6,6 +6,7 @@ using NotesApp.DbStuff.Models.Notes;
 using NotesApp.DbStuff.Repositories.Interfaces.Notes;
 using NotesApp.Enum;
 using NotesApp.Models.Notes;
+using NotesApp.Services;
 
 namespace NotesApp.Controllers;
 
@@ -14,18 +15,26 @@ namespace NotesApp.Controllers;
 public class CategoriesController : Controller
 {
     private ICategoryRepository _categoryRepository;
+    private IAuthNotesService _authNotesService;
 
-    public CategoriesController(ICategoryRepository categoryRepository)
+    public CategoriesController(ICategoryRepository categoryRepository, IAuthNotesService authNotesService)
     {
         _categoryRepository = categoryRepository;
+        _authNotesService = authNotesService;
     }
     public IActionResult Index()
     {
+        var canDelete = _authNotesService.IsAuthenticated() &&
+                        (_authNotesService.GetRole() == NotesUserRole.Administrator ||
+                         _authNotesService.GetRole() == NotesUserRole.Moderator);
+
         var categoryViewModels = _categoryRepository
             .GetAll()
             .Select(x => new CategoryViewModel
             {
+                Id = x.Id,
                 Name = x.Name,
+                IsAllowedToDelete = canDelete
             })
             .ToList();
 
@@ -61,5 +70,14 @@ public class CategoriesController : Controller
         _categoryRepository.Add(category);
 
         return RedirectToAction("Index", "Notes");
+    }
+
+    [HttpGet]
+    [RoleNotes(NotesUserRole.Administrator, NotesUserRole.Moderator)]
+    public IActionResult Remove(int id)
+    {
+        _categoryRepository.Remove(id);
+
+        return RedirectToAction("Index");
     }
 }
