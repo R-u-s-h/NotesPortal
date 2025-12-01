@@ -37,7 +37,9 @@
                         <input type="text" class="edit hidden" value="@note.Title"/>
                         <span class="empty-title hidden" style="color:red;">@ValidationMessages.RequiredTitle</span>
                     </div>
-                    <p class="note-text">@note.Description</p>
+                    <div class="note-text">
+                        @Html.Raw(note.Description)
+                    </div>
                     <a href="#" class="toggle-note" 
                        data-show="@Notes.Show"
                        data-hide="@Notes.Hide">

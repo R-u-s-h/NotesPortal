@@ -22,6 +22,7 @@ public class NotesController : Controller
     private IUserNotesRepository _userNotesRepository;
     private IAuthNotesService _authNotesService;
     private INotePermission _notePermission;
+    private INoteHtmlSanitizer _noteHtmlSanitizer;
 
     public NotesController(
         INoteRepository noteRepository,
@@ -29,7 +30,8 @@ public class NotesController : Controller
         ITagRepository tagRepository,
         IUserNotesRepository userNotesRepository,
         IAuthNotesService authNotesService,
-        INotePermission notePermission)
+        INotePermission notePermission,
+        INoteHtmlSanitizer noteHtmlSanitizer)
     {
         _noteRepository = noteRepository;
         _categoryRepository = categoryRepository;
@@ -37,6 +39,7 @@ public class NotesController : Controller
         _userNotesRepository = userNotesRepository;
         _authNotesService = authNotesService;
         _notePermission = notePermission;
+        _noteHtmlSanitizer = noteHtmlSanitizer;
     }
 
     [AllowAnonymous]
@@ -137,7 +140,7 @@ public class NotesController : Controller
         var note = new Note
         {
             Title = viewModel.Title.Trim(),
-            Description = viewModel.Description,
+            Description = _noteHtmlSanitizer.Sanitize(viewModel.Description),
             ImageUrl = viewModel.ImageUrl,
             CategoryId = viewModel.CategoryId,
             CreateDate = DateTime.UtcNow,
@@ -269,7 +272,7 @@ public class NotesController : Controller
         }
 
         note.Title = viewModel.Title.Trim();
-        note.Description = viewModel.Description;
+        note.Description = _noteHtmlSanitizer.Sanitize(viewModel.Description);
         note.ImageUrl = viewModel.ImageUrl;
         note.CategoryId = viewModel.CategoryId;
         note.UpdateDate = DateTime.UtcNow;

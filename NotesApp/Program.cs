@@ -36,6 +36,7 @@ builder.Services.AddDbContext<NotesDbContext>(
 builder.Services.AddScoped<PasswordService>();
 builder.Services.AddScoped<IAuthNotesService, AuthNotesService>();
 builder.Services.AddScoped<INotePermission, NotePermission>();
+builder.Services.AddSingleton<INoteHtmlSanitizer, NoteHtmlSanitizer>();
 
 var autoRegisterService = new AutoRegisterService();
 autoRegisterService.RegisterAllNotesRepositories(builder.Services);

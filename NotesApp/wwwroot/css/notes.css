@@ -262,6 +262,17 @@ body {
     transition: max-height 0.3s ease;
 }
 
+.note-text pre {
+    margin: 8px 0;
+    padding: 12px 16px;
+    background-color: #f6f8fa;
+    border: 1px solid #e1e4e8;
+    border-radius: 6px;
+    overflow: auto;
+    font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 14px;
+}
+
 .note-text.expanded {
     max-height: none;
 }
