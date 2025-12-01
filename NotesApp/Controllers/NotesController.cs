@@ -43,28 +43,48 @@ public class NotesController : Controller
     }
 
     [AllowAnonymous]
-    public IActionResult Index()
+    public IActionResult Index(int? categoryId = null, int? tagId = null)
     {
+        var categories = _categoryRepository
+            .GetAll()
+            .Select(c => new CategoryViewModel
+            {
+                Id = c.Id,
+                Name = c.Name
+            })
+            .ToList();
+
+        var tags = _tagRepository
+            .GetAll()
+            .Select(t => new TagViewModel
+            {
+                Id = t.Id,
+                Name = t.Name
+            })
+            .ToList();
+
+        IEnumerable<Note> notes;
+
+        if (categoryId.HasValue)
+        {
+            notes = _noteRepository.GetNotesByCategoryAsync(categoryId.Value);
+        }
+        else if (tagId.HasValue)
+        {
+            notes = _noteRepository.GetNotesByTagsAsync(new[] { tagId.Value });
+        }
+        else
+        {
+            notes = _noteRepository.GetNotesLastWeek();
+        }
+
         var viewModel = new NotesViewModel
         {
-            Categories = _categoryRepository
-                .GetAll()
-                .Select(c => new CategoryViewModel
-                {
-                    Name = c.Name
-                })
-                .ToList(),
-
-            Tags = _tagRepository
-                .GetAll()
-                .Select(t => new TagViewModel
-                {
-                    Name = t.Name
-                })
-                .ToList(),
-
-            Notes = _noteRepository
-                .GetNotesLastWeek()
+            Categories = categories,
+            Tags = tags,
+            SelectedCategoryId = categoryId,
+            SelectedTagId = tagId,
+            Notes = notes
                 .Select(n => new NoteViewModel
                 {
                     Id = n.Id,
@@ -72,10 +92,10 @@ public class NotesController : Controller
                     Description = n.Description,
                     ImageUrl = n.ImageUrl,
                     Category = n.Category != null
-                        ? new CategoryViewModel { Name = n.Category.Name }
+                        ? new CategoryViewModel { Id = n.Category.Id, Name = n.Category.Name }
                         : null,
                     Tags = n.Tags
-                        .Select(nt => new TagViewModel { Name = nt.Name })
+                        .Select(nt => new TagViewModel { Id = nt.Id, Name = nt.Name })
                         .ToList(),
                     Author = n.Author?.UserName ?? "No Author",
                     IsAllowedToDelete = _notePermission.IsAllowedToDelete(n),

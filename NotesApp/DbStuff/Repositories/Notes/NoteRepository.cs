@@ -27,6 +27,7 @@ public class NoteRepository : BaseDbRepository<Note>, INoteRepository
         return _dbSet
             .Include(n => n.Category)
             .Include(n => n.Tags)
+            .Include(n => n.Author)
             .Where(n => n.CategoryId == categoryId)
             .ToList();
     }
@@ -36,6 +37,7 @@ public class NoteRepository : BaseDbRepository<Note>, INoteRepository
         return _dbSet
             .Include(n => n.Category)
             .Include(n => n.Tags)
+            .Include(n => n.Author)
             .Where(n => n.Tags.Any(t => tagIds.Contains(t.Id)))
             .ToList();
     }

@@ -12,7 +12,12 @@
             <ul>
                 @foreach (var category in Model.Categories)
                 {
-                    <li>@category.Name</li>
+                    var isActiveCategory = Model.SelectedCategoryId == category.Id;
+                    <li class="category-item @(isActiveCategory ? "active" : "")">
+                        <a href="@Url.Action("Index", "Notes", new { categoryId = category.Id })">
+                            @category.Name
+                        </a>
+                    </li>
                 }
             </ul>
         </div>
@@ -21,7 +26,12 @@
             <ul>
                 @foreach (var tag in Model.Tags)
                 {
-                    <li>@tag.Name</li>
+                    var isActiveTag = Model.SelectedTagId == tag.Id;
+                    <li class="tag-item @(isActiveTag ? "active" : "")">
+                        <a href="@Url.Action("Index", "Notes", new { tagId = tag.Id })">
+                            @tag.Name
+                        </a>
+                    </li>
                 }
             </ul>
         </div>

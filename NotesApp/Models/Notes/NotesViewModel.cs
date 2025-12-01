@@ -7,4 +7,7 @@ public class NotesViewModel
     public List<NoteViewModel> Notes { get; set; }
     public UserNotesViewModel  UserNotes { get; set; }
     public List<BannerViewModel> Banners { get; set; }
+
+    public int? SelectedCategoryId { get; set; }
+    public int? SelectedTagId { get; set; }
 }
