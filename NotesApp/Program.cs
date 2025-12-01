@@ -50,7 +50,7 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<NotesDbContext>();
     await db.Database.MigrateAsync();
 
-    // Seed admin user from environment variables (if not exists)
+    // Seed admin user from environment variables (if not exists) test
     var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
     var adminUserName = configuration["ADMIN_USERNAME"];
     var adminPassword = configuration["ADMIN_PASSWORD"];
